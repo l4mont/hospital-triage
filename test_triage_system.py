@@ -61,14 +61,21 @@ class TestTriageSystem(unittest.TestCase):
         self.assertTrue(self.triage.is_empty())
         self.assertEqual(self.triage.size(), 0)
         self.assertIsNone(self.triage.peek_next())
+        self.assertIsNone(self.triage.process_next())
+        self.triage.add_patient("New", 1)
+        self.assertEqual(self.triage.process_next(), ("New", 1))
+        self.assertTrue(self.triage.is_empty())
 
     def test_new_arrival_can_precede_waiting_patient(self):
         self.triage.add_patient("First", 4)
         self.triage.add_patient("Waiting", 2)
         self.assertEqual(self.triage.process_next(), ("First", 4))
         self.triage.add_patient("Urgent", 5)
+        self.triage.add_patient("Later", 2)
         self.assertEqual(self.triage.process_next(), ("Urgent", 5))
         self.assertEqual(self.triage.process_next(), ("Waiting", 2))
+        self.assertEqual(self.triage.process_next(), ("Later", 2))
+        self.assertTrue(self.triage.is_empty())
 
 
 if __name__ == "__main__":
